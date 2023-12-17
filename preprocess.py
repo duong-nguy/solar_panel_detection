@@ -458,7 +458,8 @@ class FeatureSelection:
         Parse perturbation_rank_result to a dict
         and choose chanels above a thread_hold
         perturbation_rank_result: string path to perturbation rank result
-        Chat GPT wrote this
+        
+        Assuming: perturbation ranks  goo
 
         '''
         with open(perturbation_rank_result, 'r') as file:
@@ -489,16 +490,11 @@ class FeatureSelection:
     def _chanel_selection(self,img,chanels):
         return img[:,:,chanels]
 
-    def _feature_selection(self,img,chanels,output_shape):
+    def _feature_selection(self,img,output_shape,chanels=None):
         '''
             img: np.array, images and mask(label)
             chanels: list of color chanels
             output_shape: tuple preprocessing image output shape,
-        '''
-        '''
-            Future note: feature_selection may not be aproviate name if we this step before feed to
-            train module
-            if new module are made for dimentional reduction, and feature engineer then leave it as it
         '''
         img = self._resize(img,output_shape)
         if img.shape[-1] >= len(chanels):
@@ -506,8 +502,6 @@ class FeatureSelection:
 
 
         return img
-
-
 
 
     def _get_fe_file_name(self,file,is_train):
@@ -535,6 +529,11 @@ class FeatureSelection:
         target = []
         test = []
 
+        chanels = self.chanels
+        if chanels == None:
+            chanels = self._get_image_chanels(self.perturbation_rank_result,self.threshold)
+        
+
         for train_file,target_file,test_file in zip(train_files,target_files,test_files):
             train_img = tifffile.imread(train_file).astype("float32") / 10_000
             mask = tifffile.imread(target_file).astype("float32")
@@ -559,8 +558,8 @@ class FeatureSelection:
                     (test_img,test_img_fe),axis=-1)
 
             # feature_selection here
-            train_img = self._chanel_selection(train_img,self.chanels)
-            test_img = self._chanel_selection(test_img,self.chanels)
+            train_img = self._chanel_selection(train_img,chanels)
+            test_img = self._chanel_selection(test_img,chanels)
 
             train.append(train_img)
             target.append(mask)

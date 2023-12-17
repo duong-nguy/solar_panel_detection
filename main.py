@@ -12,9 +12,15 @@ def main():
     test_path =  'data/eval'
     sample_path = 'data/eval/samples'
     preprocess_output = (26,26,20)
+
+    perturbation_epochs = 500 
+    perturbation_batch = 129
+
+    threshold = 0.3
+
     train_input= (32,32,12)
-    epochs = 500 
-    batch = 129
+    train_epochs = 500 
+    train_batch = 129
     learning_rate = 3e-6
     
     modules.append(
@@ -27,21 +33,21 @@ def main():
                          output_shape=preprocess_output))
     modules.append(
             PerturbationRank(project_root=project_root,hypermodel=unet_plus_2d,
-                            batch=8,epochs=80))
+                            batch=perturbation_batch,epochs=perturbation_epochs))
     modules.append(
             FeatureSelection(
-                    threshold=0.3,project_root=project_root,
+                    threshold=threshold,project_root=project_root,
                     train_path=train_path,target_path=target_path,
                     test_path=test_path,output_shape=train_input))
     modules.append(
             Train(
-                project_root=project_root,model=unet_plus_2d,# unet,unet_plus_2d
+                project_root=project_root,model=unet_plus_2d,
                 loss=hybrid_loss,#'binary_crossentropy'
                 optimizer=tf.keras.optimizers.Adam(learning_rate=learning_rate),
-                batch=batch,epochs=epochs,metrics=F1Score()))
+                batch=train_batch,epochs=train_epochs,metrics=F1Score()))
 
     modules.append(
-            Predict(project_root,test_path=test_path,sample_path=sample_path))
+            Predict(project_root,sample_path=sample_path))
 
     for module in modules:
         module.run()

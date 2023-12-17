@@ -201,15 +201,7 @@ class Train:
         return train_dataset,valid_dataset
     
     def _get_model(self,input_shape,output_shape):
-        if self.model == 'unet':
-            model = make_unet(input_shape,output_shape,True)
-        
-        elif self.model == 'unet_plus_2d':
-            model = unet_plus_2d(input_shape,output_shape,False)
-        
-        else:
-            model = debug_model(input_shape,output_shape)
-        
+        model = self.model(input_shape,output_shape)
         model.compile(
             optimizer=self.optimizer,
             loss=self.loss,
@@ -234,15 +226,16 @@ class Train:
             verbose=2
         )
 
-        model_save_name = os.path.join(self.outputs_path,f'{self.model}.keras')
+        model_save_name = os.path.join(self.outputs_path,f'{self.root}_model.keras')
         model.save(model_save_name)
-        filename = os.path.join(self.outputs_path,'history.txt')
-        with open(filename, 'w') as file:
-            file.write(str(history.history))
+#        filename = os.path.join(self.outputs_path,'history.txt')
+#        with open(filename, 'w') as file:
+#            file.write(str(history.history))
 
     def run(self):
         train_dataset,valid_dataset = self._get_dataset()
         self._train(train_dataset,valid_dataset)
+
 class FBetaScore(base_metric.Metric):
     """Computes F-Beta score.
 
