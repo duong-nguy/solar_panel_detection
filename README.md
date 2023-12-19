@@ -14,11 +14,11 @@ This project focuses on utilizing Tensorflow and Keras libraries for the segment
 Ensure you have the following dependencies installed:
 
 - Python 3.10
-- Keras Unet Collection (version 0.1.13)
 - NumPy (version 1.23.5)
 - TensorFlow (version 2.12.0)
+- Keras Unet Collection (version 0.1.13)
 
 You can install the required packages using the following command:
 
 ```bash
-pip install python==3.10 keras_unet_collection==0.1.13 numpy==1.23.5 tensorflow==2.12.0
+pip install numpy==1.23.5 tensorflow==2.12.0 keras_unet_collection==0.1.13
